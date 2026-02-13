@@ -12,12 +12,20 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CSS to Hide Streamlit Branding ---
+# --- CSS to Hide Streamlit Branding & Compact Layout ---
 hide_streamlit_style = """
             <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
+            #MainMenu {visibility: hidden; display: none;}
+            footer {visibility: hidden; display: none !important;}
+            header {visibility: hidden; display: none !important;}
+            /* Compact layout adjustments */
+            .block-container {
+                padding-top: 1rem !important;
+                padding-bottom: 0rem !important;
+            }
+            div[data-testid="stVerticalBlock"] > div {
+                gap: 0.5rem !important;
+            }
             </style>
             """
 st.markdown(hide_streamlit_style, unsafe_allow_html=True)
@@ -377,7 +385,7 @@ def main():
         y='independent'
     ).properties(
         autosize=alt.AutoSizeParams(type='fit', contains='padding'),
-        height=300 # Standard "small" widget height
+        height=220 # Reduced height for compact view
     ).interactive()
 
     # Metrics (Hidden for Notion Embed)
