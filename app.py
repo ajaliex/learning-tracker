@@ -376,7 +376,8 @@ def main():
     ).resolve_scale(
         y='independent'
     ).properties(
-        autosize=alt.AutoSizeParams(type='fit', contains='padding')
+        autosize=alt.AutoSizeParams(type='fit', contains='padding'),
+        height=300 # Standard "small" widget height
     ).interactive()
 
     # Metrics (Hidden for Notion Embed)
