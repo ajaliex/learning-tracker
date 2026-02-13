@@ -12,6 +12,16 @@ st.set_page_config(
     layout="wide"
 )
 
+# --- CSS to Hide Streamlit Branding ---
+hide_streamlit_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+
 # --- Constants (Property Names) ---
 # Modify these if your Notion database properties have different names
 PROPERTY_DATE = "日付"
