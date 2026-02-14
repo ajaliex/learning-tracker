@@ -227,7 +227,37 @@ def main():
     # Save to HTML
     # We embed the data to make it static
     chart.save('index.html')
-    print("Chart saved to index.html")
+    
+    # Post-process HTML to remove white border
+    with open("index.html", "r", encoding="utf-8") as f:
+        html = f.read()
+    
+    # Inject body style
+    style = """
+    <style>
+        body {
+            background-color: #0e1117;
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Prevent scrollbars if not needed */
+        }
+        #vis {
+            margin-top: 10px; /* Slight top margin */
+        }
+    </style>
+    """
+    
+    # Insert style before </head>
+    if "</head>" in html:
+        html = html.replace("</head>", f"{style}</head>")
+    else:
+        # Fallback if no head tag (unlikely with altair)
+        html = style + html
+        
+    with open("index.html", "w", encoding="utf-8") as f:
+        f.write(html)
+        
+    print("Chart saved to index.html with dark mode styles")
 
 if __name__ == "__main__":
     main()
