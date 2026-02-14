@@ -235,14 +235,22 @@ def main():
     # Inject body style
     style = """
     <style>
+        html {
+            background-color: #0e1117;
+            height: 100%;
+        }
         body {
             background-color: #0e1117;
             margin: 0;
             padding: 0;
+            min-height: 100%;
             overflow: hidden; /* Prevent scrollbars if not needed */
+            display: flex;
+            align-items: center; /* Vertical center */
+            justify-content: center; /* Horizontal center */
         }
         #vis {
-            margin-top: 10px; /* Slight top margin */
+            /* Remove margin-top as we center with flexbox */
         }
     </style>
     """
