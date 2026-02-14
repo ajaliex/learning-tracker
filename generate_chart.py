@@ -181,12 +181,27 @@ def create_chart(df):
     ).properties(
         title=f"Learning Progress - {current_month_label}",
         width='container',
-        height=400 
+        height=220, # Compact height
+        background='#0e1117' # Dark background
+    ).configure(
+        background='#0e1117'
     ).configure_axis(
-        labelFontSize=12,
-        titleFontSize=14
+        labelFontSize=10,
+        titleFontSize=12,
+        labelColor='#fafafa',
+        titleColor='#fafafa',
+        gridColor='#333333',
+        domainColor='#fafafa'
     ).configure_title(
-        fontSize=16
+        fontSize=14,
+        color='#fafafa',
+        anchor='start',
+        offset=10
+    ).configure_view(
+        strokeWidth=0 # Remove border around chart
+    ).configure_legend(
+        labelColor='#fafafa',
+        titleColor='#fafafa'
     )
 
     return chart
