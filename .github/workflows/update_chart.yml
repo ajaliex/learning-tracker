@@ -2,8 +2,8 @@ name: Update Learning Chart
 
 on:
   schedule:
-    # Run at 6:00 JST (21:00 UTC previous day)
-    - cron: '0 21 * * *'
+    # 日本時間の 2:00 (17:00 UTC) に実行
+    - cron: '0 17 * * *'
   workflow_dispatch:
 
 permissions:
