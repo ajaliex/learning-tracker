@@ -76,6 +76,73 @@ def fetch_data():
         
     return pd.DataFrame(data)
 
+def fetch_goal_data():
+    import httpx
+    
+    # Use the same default API KEY logic
+    api_key = os.environ.get('NOTION_API_KEY')
+    if not api_key:
+        return 6000
+    
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Notion-Version": "2022-06-28",
+        "Content-Type": "application/json"
+    }
+    
+    goal_database_id = os.environ.get('NOTION_GOAL_DATABASE_ID')
+    if not goal_database_id:
+        print("Warning: NOTION_GOAL_DATABASE_ID not set. Defaulting to 6000 minutes.")
+        return 6000
+
+    goal_database_id = goal_database_id.strip()
+
+    has_more = True
+    start_cursor = None
+    results = []
+
+    print("Fetching goal data from Notion...")
+    while has_more:
+        body = {"page_size": 100}
+        if start_cursor:
+            body["start_cursor"] = start_cursor
+
+        response = httpx.post(
+            f"https://api.notion.com/v1/databases/{goal_database_id}/query",
+            headers=headers,
+            json=body
+        )
+        
+        try:
+            response.raise_for_status()
+            data = response.json()
+            results.extend(data["results"])
+            has_more = data["has_more"]
+            start_cursor = data.get("next_cursor")
+        except Exception as e:
+            print(f"Error querying goal database: {e}")
+            return 6000
+    
+    now = datetime.now()
+    current_month_key = now.strftime("%Y-%b")
+
+    goal_minutes = 6000 # default
+    for page in results:
+        props = page["properties"]
+        month_prop = props.get("月タイトル", {})
+        if not month_prop or not month_prop.get("title"):
+             continue
+        month_str = month_prop["title"][0]["text"]["content"]
+        
+        if month_str == current_month_key:
+            goal_prop = props.get("目標学習時間", {})
+            if goal_prop and goal_prop.get("type") == "number":
+                 goal_minutes = (goal_prop.get("number") or 0) * 60
+            break
+            
+    print(f"Goal for {current_month_key} is {goal_minutes} minutes.")
+    return goal_minutes
+
 def process_data(df):
     if df.empty:
         return pd.DataFrame(columns=["date", "minutes", "monthly_cumulative", "moving_avg_60d"])
@@ -103,7 +170,7 @@ def process_data(df):
     
     return df_current_month
 
-def create_chart(df):
+def create_chart(df, goal_minutes):
     if df.empty:
         print("No data for current month.")
         return
@@ -124,10 +191,10 @@ def create_chart(df):
     
     current_month_label = start_of_month.strftime("%B %Y")
     
-    # Create Ideal Line Data (0 to 6000 minutes)
+    # Create Ideal Line Data (0 to goal_minutes)
     ideal_df = pd.DataFrame([
         {"date": start_of_month, "minutes": 0},
-        {"date": end_of_month, "minutes": 6000}  # 100 hours * 60 min
+        {"date": end_of_month, "minutes": goal_minutes}
     ])
 
     # Base Chart
@@ -216,13 +283,12 @@ def main():
     
     if processed_df.empty:
         print("No data found for the current month. Generating empty chart.")
-        # Create a dummy empty chart or just exit? 
-        # Better to save an empty HTML to avoid 404
         with open("index.html", "w") as f:
             f.write("<html><body><h1>No data available for this month</h1></body></html>")
         return
 
-    chart = create_chart(processed_df)
+    goal_minutes = fetch_goal_data()
+    chart = create_chart(processed_df, goal_minutes)
     
     # Save to HTML
     # We embed the data to make it static

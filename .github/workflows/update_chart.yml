@@ -29,6 +29,7 @@ jobs:
         env:
           NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
           NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          NOTION_GOAL_DATABASE_ID: ${{ secrets.NOTION_GOAL_DATABASE_ID }}
         run: |
           python generate_chart.py
 
